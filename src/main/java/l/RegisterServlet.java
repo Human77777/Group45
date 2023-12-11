@@ -18,14 +18,16 @@ public class RegisterServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         String username = request.getParameter("username");
-        String password = request.getParameter("password"); 
-        // Use try-with-resources to ensure closure of resources
+        String password = request.getParameter("password");
+        String role = "customer"; 
+
         try (Connection conn = DriverManager.getConnection(
                 "jdbc:mysql://localhost:3306/userpass", "root", "Example@2022#");
-             PreparedStatement ps = conn.prepareStatement("INSERT INTO login (uname, password) VALUES (?, ?)")) {
+             PreparedStatement ps = conn.prepareStatement("INSERT INTO login (uname, password, role) VALUES (?, ?, ?)")) {
 
             ps.setString(1, username);
             ps.setString(2, password);
+            ps.setString(3, role); 
 
             int result = ps.executeUpdate();
             if (result > 0) {

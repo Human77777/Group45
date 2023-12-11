@@ -4,7 +4,7 @@
     <title>Login Page</title>
 </head>
 <body>
-    <h2>Login Page</h2>
+    <h2>User Login Page</h2>
     <form action="LoginS" method="post">
     <table>
         <tr><td>UserName:</td><td><input type="text" name="txtName"></td></tr>
