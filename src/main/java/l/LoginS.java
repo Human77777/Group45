@@ -43,7 +43,7 @@ public class LoginS extends HttpServlet {
 
                 // Redirect user based on role
                 if ("customer".equals(role)) {
-                    response.sendRedirect("Welcome.jsp"); // Customer welcome page
+                    response.sendRedirect("main.jsp"); // Customer welcome page
                 } else if ("representative".equals(role)) {
                     response.sendRedirect("representative.jsp"); // Representative welcome page
                 } else if ("admin".equals(role)) {
