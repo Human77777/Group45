@@ -28,7 +28,7 @@ public class LoginS extends HttpServlet {
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/userpass", "root", "Example@2022#");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/System", "root", "Example@2022#");
             String n = request.getParameter("txtName");
             String p = request.getParameter("txtPwd");
 

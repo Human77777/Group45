@@ -22,7 +22,7 @@ public class RegisterServlet extends HttpServlet {
         String role = "customer"; 
 
         try (Connection conn = DriverManager.getConnection(
-                "jdbc:mysql://localhost:3306/userpass", "root", "Example@2022#");
+                "jdbc:mysql://localhost:3306/System", "root", "Example@2022#");
              PreparedStatement ps = conn.prepareStatement("INSERT INTO login (uname, password, role) VALUES (?, ?, ?)")) {
 
             ps.setString(1, username);
