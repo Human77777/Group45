@@ -10,62 +10,85 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/FlightSearchServlet")
 public class FlightSearchServlet extends HttpServlet {
+    
+    private String buildFlightSearchQuery(String departure, String arrival, String departureDate, boolean isFlexible) {
+        String sql = "SELECT * FROM flight WHERE departure_airport = ? AND destination_airport = ?";
+        if (departureDate != null && !departureDate.trim().isEmpty()) {
+            if (isFlexible) {
+                sql += " AND departure_time BETWEEN DATE_SUB(?, INTERVAL 3 DAY) AND DATE_ADD(?, INTERVAL 3 DAY)";
+            } else {
+                sql += " AND DATE(departure_time) = ?";
+            }
+        }
+        return sql;
+    }
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        String departure = request.getParameter("departure");
-        String arrival = request.getParameter("arrival");
-        String departureDate = request.getParameter("departureDate");
-        String returnDate = request.getParameter("returnDate"); // for round-trip
-        String tripType = request.getParameter("tripType"); // "one-way" or "round-trip"
-        boolean isFlexible = request.getParameter("isFlexible") != null; // checkbox for flexible dates
-
-        List<Flight> flights = new ArrayList<>();
-        String sql = buildFlightSearchQuery(departure, arrival, departureDate, returnDate, tripType, isFlexible);
-
+        String departure = request.getParameter("departure").toUpperCase();
+        String arrival = request.getParameter("arrival").toUpperCase();
+        String departureDateString = request.getParameter("date"); 
+        boolean isFlexible = request.getParameter("isFlexible") != null;
+        
+        List<Flight> flight = new ArrayList<>();
+        String sql = buildFlightSearchQuery(departure, arrival, departureDateString, isFlexible);
+        
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/System", "root", "Example@2022#");
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, departure);
             ps.setString(2, arrival);
-
-            if (isFlexible) {
-                // Set parameters for flexible dates
-                ps.setString(3, departureDate); // actual SQL function for date flexibility will be needed
-                // More date flexibility handling here
-            } else {
-                ps.setString(3, departureDate);
-            }
-
-            if ("round-trip".equals(tripType)) {
-                ps.setString(4, returnDate); // or the next index depending on the flexibility handling
-            }
-
-            ResultSet rs = ps.executeQuery();
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Flight flight = new Flight();
-                    flight.setAirlineCompanyId(rs.getInt("airline_company_id"));
-                    flight.setFlightNumber(rs.getString("flight_number"));
-                    flight.setDepartureAirport(rs.getString("departure_airport"));
-                    flight.setDestinationAirport(rs.getString("destination_airport"));
-                    flight.setDepartureTime(rs.getString("departure_time"));
-                    flight.setArrivalTime(rs.getString("arrival_time"));
-                    
-                    flights.add(flight);
+            int paramIndex = 3;
+            
+            if (departureDateString != null && !departureDateString.trim().isEmpty()) {
+                if (isFlexible) {
+                    Timestamp departureTimestamp = Timestamp.valueOf(departureDateString + " 00:00:00");
+                    ps.setTimestamp(paramIndex++, departureTimestamp);
+                    ps.setTimestamp(paramIndex, departureTimestamp);  
+                } else {
+                    ps.setDate(paramIndex, java.sql.Date.valueOf(departureDateString));  
                 }
             }
+            
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                flight.add(new Flight(
+                    rs.getInt("airline_company_id"),
+                    rs.getString("flight_number"),
+                    rs.getString("departure_airport"),
+                    rs.getString("destination_airport"),
+                    rs.getString("departure_time"),
+                    rs.getString("arrival_time"),
+                    rs.getString("days"),
+                    rs.getString("type").charAt(0)
+                ));
+            }
+            if (flight.isEmpty()) {
+                System.out.println("No flights found for the query: " + sql);
+            } else {
+                System.out.println(flight.size() + " flights found.");
+                System.out.println("SQL Query: " + sql);
+
+            }
         } catch (Exception e) {
-            e.printStackTrace(); // Log this exception to logging system
+            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage()); // Logging the exception message
+            request.setAttribute("error", "There was an error processing your request.");
+            request.getRequestDispatcher("/main.jsp").forward(request, response);
+            return;
         }
 
-        request.setAttribute("flights", flights);
+        request.setAttribute("flights", flight);
         request.getRequestDispatcher("/flightsResults.jsp").forward(request, response);
     }
+    
+    /*
     private String buildFlightSearchQuery(String departure, String arrival, String departureDate, String returnDate, String tripType, boolean isFlexible) {
         String sql = "SELECT * FROM flights WHERE departure_airport = ? AND destination_airport = ?";
         
@@ -83,6 +106,9 @@ public class FlightSearchServlet extends HttpServlet {
 
         return sql;
     }
+    */
+    
+    
     public class Flight {
         private int airlineCompanyId;
         private String flightNumber;
@@ -96,7 +122,7 @@ public class FlightSearchServlet extends HttpServlet {
         // Constructor
         public Flight(int airlineCompanyId, String flightNumber, String departureAirport,
                       String destinationAirport, String departureTime, String arrivalTime,
-                      String days, char type) {
+                      String days, char i) {
             this.airlineCompanyId = airlineCompanyId;
             this.flightNumber = flightNumber;
             this.departureAirport = departureAirport;
@@ -104,7 +130,7 @@ public class FlightSearchServlet extends HttpServlet {
             this.departureTime = departureTime;
             this.arrivalTime = arrivalTime;
             this.days = days;
-            this.type = type;
+            this.type = i;
         }
 
         // Getters and setters for each property
@@ -133,5 +159,7 @@ public class FlightSearchServlet extends HttpServlet {
         public void setType(char type) { this.type = type; }
 
     }
+    
+    
 
 }

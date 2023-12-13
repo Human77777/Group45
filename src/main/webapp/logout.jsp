@@ -1,4 +1,4 @@
-<%@ page import="javax.servlet.http.*, javax.servlet.*" %>
+
 <%
 //Checking if the session already exists
     if (session != null) {
