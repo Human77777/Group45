@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://jakarta.ee/xml/ns/jakartaee" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd" id="WebApp_ID" version="6.0">
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
   <display-name>login</display-name>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
@@ -13,7 +17,7 @@
     <description></description>
     <display-name>LoginServlet</display-name>
     <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>l.LoginServlet</servlet-class>
+    <servlet-class>controller.LoginServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LoginServlet</servlet-name>
@@ -23,7 +27,7 @@
     <description></description>
     <display-name>s</display-name>
     <servlet-name>s</servlet-name>
-    <servlet-class>l.s</servlet-class>
+    <servlet-class>controller.s</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>s</servlet-name>
@@ -33,7 +37,7 @@
     <description></description>
     <display-name>LoginS</display-name>
     <servlet-name>LoginS</servlet-name>
-    <servlet-class>l.LoginS</servlet-class>
+    <servlet-class>controller.LoginS</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>LoginS</servlet-name>

@@ -1,10 +1,11 @@
-package l;
+package controller;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,7 +18,7 @@ import java.util.List;
 @WebServlet("/FlightSearchServlet")
 public class FlightSearchServlet extends HttpServlet {
     
-    private String buildFlightSearchQuery(String departure, String arrival, String departureDate, boolean isFlexible) {
+	private String buildFlightSearchQuery(String departure, String arrival, String departureDate, boolean isFlexible) {
         String sql = "SELECT * FROM flight WHERE departure_airport = ? AND destination_airport = ?";
         if (departureDate != null && !departureDate.trim().isEmpty()) {
             if (isFlexible) {
